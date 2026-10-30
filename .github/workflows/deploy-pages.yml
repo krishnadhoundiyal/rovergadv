@@ -24,10 +24,19 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Stage project path under custom domain
+        run: |
+          mkdir -p pages-site/rovergadv
+          cp -R dist/. pages-site/rovergadv/
+          printf '%s\n' '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=/rovergadv/"><title>GADV D4-S</title></head><body><a href="/rovergadv/">Open GADV D4-S Mission Control</a></body></html>' > pages-site/index.html
+          test -f pages-site/rovergadv/index.html
+          test -f pages-site/rovergadv/favicon.svg
+          test -d pages-site/rovergadv/assets
+          grep -q '/rovergadv/' pages-site/rovergadv/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: pages-site
   deploy:
     environment:
       name: github-pages
