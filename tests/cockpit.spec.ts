@@ -125,6 +125,7 @@ test('all utility, instrument, rate and map controls respond; portrait preserves
   await page.locator('.status-row').first().click();await expect(page.getByRole('dialog')).toContainText('DS18B20');await page.keyboard.press('Escape');
   await page.getByRole('button',{name:'Expand terrain map'}).click();await expect(page.locator('.expanded-map')).toBeVisible();await page.getByRole('button',{name:'Close dialog'}).click();
   await page.getByRole('button',{name:'Open settings'}).click();await page.getByLabel('Minimal HUD').check();await page.getByLabel('Reduce decorative motion').check();await page.getByRole('button',{name:'Close dialog'}).click();await expect(page.locator('.hud')).toHaveClass(/hud-minimal/);await expect(page.locator('main')).toHaveClass(/reduced-motion/);
-  await page.setViewportSize({width:834,height:1194});await expect(page.getByRole('heading',{name:'Explore in landscape.'})).toBeVisible();await page.screenshot({path:`docs/qa/${info.project.name}-portrait.png`});
+  await page.getByRole('button',{name:'Open settings'}).click();await expect(page.getByRole('dialog')).toBeVisible();
+  await page.setViewportSize({width:834,height:1194});await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page.getByRole('heading',{name:'Explore in landscape.'})).toBeVisible();await page.screenshot({path:`docs/qa/${info.project.name}-portrait.png`});
   await page.setViewportSize({width:1194,height:834});await expect(page.getByRole('button',{name:'LIGHTS',exact:true})).toHaveAttribute('aria-pressed','true');expect(errors).toEqual([]);
 });

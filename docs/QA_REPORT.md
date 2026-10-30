@@ -43,7 +43,7 @@ Reviewed against the **screen interior** of the frozen reference, with the requi
 - [Test camera active](qa/chromium-camera-active.png)
 - [Scan mode](qa/chromium-scan.png)
 - [Portrait rotation prompt](qa/chromium-portrait.png)
-- WebKit landscape, test-camera and portrait screenshots are included in the linked CI artifact.
+- Permanent WebKit evidence: [1024 × 768](qa/webkit-1024x768-fallback.png), [1366 × 1024](qa/webkit-1366x1024-fallback.png), [test camera](qa/webkit-camera-active.png), [portrait](qa/webkit-portrait.png). Other WebKit screenshots are included in the linked CI artifact.
 
 Viewport bounds and document scroll dimensions are asserted in browser tests. Fine outlines, charcoal panels, cyan/amber joystick positions, three-column upper composition and bottom instruments/actions preserve the supplied panel rhythm. The center remains the largest panel. Contours, reticle, joystick surfaces and elevation are real SVG/CSS/DOM. Asset edit provenance and prompt are in `ASSET_PROVENANCE.md`.
 
@@ -52,6 +52,7 @@ Viewport bounds and document scroll dimensions are asserted in browser tests. Fi
 - Camera errors now classify DOMExceptions across JavaScript realms instead of relying on `instanceof Error`.
 - Stale playback promises cannot interrupt a replacement stream. Buffering/paused previews withdraw the live badge and time out to Retry.
 - Camera switching updates the front/rear label. Mode changes, blur, backgrounding and portrait rotation clear held input.
+- Rotating with a dialog open dismisses it so the landscape instruction remains unobstructed; virtual position, heading and settings persist. The utilities browser test covers this transition.
 - Compass marks are centered independently of font metrics; map height labels fit without wrapping.
 - Barlow Semi Condensed and its license are bundled locally so cockpit typography is consistent across Windows, iPad Safari and Linux. No external font request is made.
 - Browser tests wait for the nonblocking boot banner to finish instead of racing its removal. CDP touch-end events identify the released contact; tests independently release one stick while the other continues.

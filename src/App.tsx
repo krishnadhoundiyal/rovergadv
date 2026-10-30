@@ -56,7 +56,7 @@ export function App() {
       else if (resume) { resume = false; void camera.start(); }
     };
     const pagehide = () => { blur(); camera.release('paused'); };
-    const resize = () => { if (window.innerHeight > window.innerWidth) blur(); };
+    const resize = () => { if (window.innerHeight > window.innerWidth) { blur(); setDialog(null); } };
     window.addEventListener('blur', blur);
     document.addEventListener('visibilitychange', visibility);
     window.addEventListener('pagehide', pagehide);
