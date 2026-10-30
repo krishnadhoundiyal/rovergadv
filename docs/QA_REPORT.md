@@ -14,10 +14,14 @@ Windows host; workspace-local **Node 22.22.2**, npm 10.2.3. Production preview s
 | `npm test` | Passed: 27 tests in 3 files. |
 | `npm run build` | Passed: Vite production build, Safari 16 compilation target. |
 | Chromium browser suite | Passed: 9/9. Playwright 1.64.1 with installed Chromium revision 1243. |
-| Local WebKit availability | Not installed. Linux CI cross-browser verification is pending. |
+| Linux CI | Passed: ordinary `npm ci`, lint, typecheck, all 27 unit/integration tests, build, and 17 browser tests. |
+| WebKit mobile-like project | Passed: 8/8 applicable tests on Linux WebKit 27.2, revision 2370. |
+| Local WebKit availability | Not installed; the WebKit results above are from Linux CI. |
 | Physical iPad / Safari hardware | Not available; no physical-device testing is claimed. |
 
 The local drive was nearly full. Initial dependency installs failed with ENOSPC and registry stream timeouts. Disposable npm downloads were cleared and task-local tool/dependency files compressed. Exact lockfile tarballs were integrity-verified against their SHA hashes, then the successful **`npm ci --offline --cache=.tools/npm-ci-cache`** ran from that cache. This is a clean npm install, not copied or hand-wired dependencies. CI uses ordinary `npm ci`. Local browser runs used `LOW_STORAGE=1` to disable large traces; CI retains failure traces. These environment failures are separate from passing application checks.
+
+The [initial successful Linux CI run](https://github.com/krishnadhoundiyal/rovergadv/actions/runs/41038759231) used Ubuntu 24.04, Node 22.23.4, npm 10.9.9, Chromium 156.0.8078.4 (revision 1248), and WebKit 27.2 (revision 2370). Browser results: **17 passed, 1 explicitly skipped**. The skipped case is Chromium-specific CDP multi-touch injection; independent pointer ownership/cancel is covered by unit tests and the remaining pointer/navigation tests run in WebKit. The [cockpit-qa artifact](https://github.com/krishnadhoundiyal/rovergadv/actions/runs/41038759231/artifacts/12968813938) includes both engines' screenshots and the HTML report, retained for 14 days. This PR's current checks and latest artifacts cover subsequent typography/evidence refinements.
 
 ## Behavior verified
 
@@ -39,6 +43,7 @@ Reviewed against the **screen interior** of the frozen reference, with the requi
 - [Test camera active](qa/chromium-camera-active.png)
 - [Scan mode](qa/chromium-scan.png)
 - [Portrait rotation prompt](qa/chromium-portrait.png)
+- WebKit landscape, test-camera and portrait screenshots are included in the linked CI artifact.
 
 Viewport bounds and document scroll dimensions are asserted in browser tests. Fine outlines, charcoal panels, cyan/amber joystick positions, three-column upper composition and bottom instruments/actions preserve the supplied panel rhythm. The center remains the largest panel. Contours, reticle, joystick surfaces and elevation are real SVG/CSS/DOM. Asset edit provenance and prompt are in `ASSET_PROVENANCE.md`.
 
@@ -48,6 +53,7 @@ Viewport bounds and document scroll dimensions are asserted in browser tests. Fi
 - Stale playback promises cannot interrupt a replacement stream. Buffering/paused previews withdraw the live badge and time out to Retry.
 - Camera switching updates the front/rear label. Mode changes, blur, backgrounding and portrait rotation clear held input.
 - Compass marks are centered independently of font metrics; map height labels fit without wrapping.
+- Barlow Semi Condensed and its license are bundled locally so cockpit typography is consistent across Windows, iPad Safari and Linux. No external font request is made.
 - Browser tests wait for the nonblocking boot banner to finish instead of racing its removal. CDP touch-end events identify the released contact; tests independently release one stick while the other continues.
 
 ## Deployment and remaining acceptance boundary
