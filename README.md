@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open the printed `/rovergadv/` URL. For the production build:
+Open the printed local development URL. The deployed site is served at `/` on its custom domain. For the production build:
 
 ```sh
 npm run lint
@@ -23,13 +23,22 @@ npm run test:e2e
 npm run preview
 ```
 
-The browser suite starts production preview at `http://127.0.0.1:4173/rovergadv/`. Chromium and WebKit are distinct projects. Tests use a labeled canvas MediaStream for camera success, mock errors, and do not need a physical camera. `npm run test:e2e -- --project=chromium` selects one engine. `CHROMIUM_PATH` can select an installed Chromium executable for local QA. CI installs both engines and uploads browser reports, failure traces and screenshots. `docs/QA_REPORT.md` records checks actually performed; local screenshots are in `docs/qa/`.
+The browser suite starts production preview at `http://127.0.0.1:4173/`. Chromium and WebKit are distinct projects. Tests use a labeled canvas MediaStream for camera success, mock errors, and do not need a physical camera. `npm run test:e2e -- --project=chromium` selects one engine. `CHROMIUM_PATH` can select an installed Chromium executable for local QA. CI installs both engines and uploads browser reports, failure traces and screenshots. `docs/QA_REPORT.md` records checks actually performed; local screenshots are in `docs/qa/`.
 
-## GitHub Pages
+## GitHub Pages — custom domain
 
-Target: [GADV D4-S cockpit](https://krishnadhoundiyal.github.io/rovergadv/).
+Public address (once DNS, Pages settings and HTTPS provisioning succeed): **https://gadv.gravitymatter.com/**
 
-Vite base is `/rovergadv/`. After PR review and merge, the Pages workflow builds `main` and deploys `dist`. **Manual repository setting:** Settings → Pages → Build and deployment → Source → **GitHub Actions**. The repository must permit Pages deployments and Actions must have the workflow's `pages: write` and `id-token: write` permissions. This PR does not merge or publish itself. The deployment workflow can also be dispatched manually after it is on `main`.
+The Vite production base path is `/` for the root of this custom domain; the preview and end-to-end tests use root-path URLs. This repository uses a **GitHub Actions deployment workflow**, so GitHub's Pages custom-domain configuration lives in **Settings → Pages**, not in a source `CNAME` file. Any source `CNAME` file would be ignored for Actions-based deployment.
+
+To activate the custom domain, the domain administrator should perform the following in this order:
+
+1. In **Settings → Pages**, select **Source: GitHub Actions**, then save **Custom domain: `gadv.gravitymatter.com`**. Verify domain ownership if GitHub asks. This needs repository Pages administrative access.
+2. In the DNS zone for `gravitymatter.com`, create/update **CNAME `gadv` → `krishnadhoundiyal.github.io`** (without `/rovergadv`). Remove any conflicting records for that exact hostname. Configure the hostname in GitHub Pages **before** publishing the CNAME to avoid subdomain takeover.
+3. Merge the domain configuration PR; then run (or re-run) `.github/workflows/deploy-pages.yml` from `main` after Pages source is enabled. The workflow runs on merges to `main` automatically.
+4. When DNS is verified and GitHub has provisioned its certificate, enable **Enforce HTTPS** in Pages settings. On the iPad open **https://gadv.gravitymatter.com/** (HTTPS is required for camera permission).
+
+DNS propagation and TLS provisioning may not be immediate. Do not claim deployment success until the Pages workflow passes and the public HTTPS site resolves with all assets. The legacy project URL can redirect to the configured custom hostname after Pages has been configured.
 
 ## iPad Pro Safari camera
 
