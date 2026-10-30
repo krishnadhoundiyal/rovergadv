@@ -1,25 +1,63 @@
-# GADV D4-S Mission Control
+# GADV D4-S · Mission control demo
 
-An iPad Pro landscape, camera-led rover cockpit showcase.
+A touch-first iPad landscape cockpit built from the frozen design in the supplied kit. React, Vite, TypeScript; static hosting; Node **22**. The actual iPad camera is the only live input. Every instrument, heading, motion vector, distance, elevation and contour is **simulated locally**. There is no rover connection, backend, remote video, microphone, geolocation, Bluetooth, recording, upload, analytics or external runtime service.
 
-## Frozen design and project scope
+## Run and verify
 
-The cockpit design is **approved and frozen**. Retain its dark charcoal layout, cyan translation control, amber rotation control, prominent central camera viewport, lower instruments, and left/right status panels. The actual GADV rover geometry must be based on the supplied CAD reference; the physical rover's coloring is **white and green**. The screenshot's generic rover illustration and its pretend telemetry are not hardware evidence.
+Use Node 22.22.2 or newer within the 22.x line (`nvm use` reads `.nvmrc`).
 
-**Today is demonstration-only.** The center uses the iPad **rear camera**, with local digital pan/zoom/crop and HUD effects when touching the joysticks. No backend, GPS, ESP32 command link, remote video, real sensor feed, microphone, upload, or analytics. Clearly label simulated motion and instrument values.
+```sh
+npm ci
+npm run dev
+```
 
-## Implementation
+Open the printed `/rovergadv/` URL. For the production build:
 
-- React + Vite + TypeScript, Node 22, production static app, iPadOS Safari landscape.
-- Secure **HTTPS** required for rear camera permission.
-- Real joysticks: pointer/touch capture, 360-degree translation, rotation/yaw, diagonal support, release-to-center, HOLD, SCAN and mode actions.
-- Camera errors, permissions, stream cleanup/resume, simulated motion cropping limits and no dead buttons.
-- iPad responsive testing, accessibility, unit/e2e tests, CI, GitHub Pages workflow, documented video capture instructions.
-- Full code + test evidence in one reviewed PR; **do not auto-merge**.
+```sh
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npx playwright install chromium webkit
+npm run test:e2e
+npm run preview
+```
 
-## One-shot Codex handoff
+The browser suite starts production preview at `http://127.0.0.1:4173/rovergadv/`. Chromium and WebKit are distinct projects. Tests use a labeled canvas MediaStream for camera success, mock errors, and do not need a physical camera. `npm run test:e2e -- --project=chromium` selects one engine. `CHROMIUM_PATH` can select an installed Chromium executable for local QA. CI installs both engines and uploads browser reports, failure traces and screenshots. `docs/QA_REPORT.md` records checks actually performed; local screenshots are in `docs/qa/`.
 
-The complete build specification and two reference images are packaged separately as `GADV_Codex_One_Shot_Kit.zip` in the originating ChatGPT conversation. **Provide the complete kit to Codex before starting development**. The approved cockpit reference image is required for pixel-accurate layout; the actual GADV CAD image is required for vehicle shape. This README is a brief summary, **not a substitute for that package**.
+## GitHub Pages
 
-Run the entire build, test and self-correction cycle in one Codex task. Never claim physical iPad testing if the device was not available.
+Target: [GADV D4-S cockpit](https://krishnadhoundiyal.github.io/rovergadv/).
+
+Vite base is `/rovergadv/`. After PR review and merge, the Pages workflow builds `main` and deploys `dist`. **Manual repository setting:** Settings → Pages → Build and deployment → Source → **GitHub Actions**. The repository must permit Pages deployments and Actions must have the workflow's `pages: write` and `id-token: write` permissions. This PR does not merge or publish itself. The deployment workflow can also be dispatched manually after it is on `main`.
+
+## iPad Pro Safari camera
+
+1. Open the HTTPS Pages URL in Safari and rotate the iPad to landscape. Portrait displays a rotation prompt and preserves the current demo.
+2. Tap **ENABLE CAMERA** and allow Camera for this website. The request explicitly disables audio and prefers the rear camera. Safari chooses available hardware; it may ignore that preference. The **CAMERA** utility offers **Switch camera** as a front/rear fallback, or **Stop camera** to release the hardware.
+3. **LOCAL LIVE** appears only after a live video track is playing. Without permission or available hardware, the center remains a styled, clearly non-live fallback. The controls still demonstrate local motion.
+4. If access is denied, use Safari's website menu → Website Settings → Camera → Allow (wording varies with iPadOS), then tap **RETRY CAMERA**. If busy, close other camera apps. Camera APIs require HTTPS or same-device localhost; an HTTP LAN address will not work. A desktop localhost URL is not the iPad's localhost.
+5. Backgrounding stops camera tracks and cancels joystick input. Returning attempts to resume only a previously active preview; use Retry if Safari requires another gesture. Delayed metadata, interrupted tracks and playback failures show a retry state. Closing the app stops tracks.
+
+Only video is previewed in a muted, inline `<video>`. No media is stored or sent. A limited digital crop provides simulated visual movement; it cannot reveal anything outside the physical camera frame. Heading and virtual position persist after release; speed settles to zero. HOLD immediately stops movement. SCAN stops driving and animates a synthetic ultrasonic/contour sweep. DRIVE MODE resumes driving.
+
+## Record a showcase
+
+1. Mount the iPad in landscape facing the desired real scene. Enable the camera.
+2. Tap **DEMO RESET** for heading 003°, zero position, normal rates, default HUD and a cleared virtual path. Reset deliberately preserves a running camera to avoid another permission prompt.
+3. Start **iPadOS Control Center → Screen Recording**. Leave the screen recorder's microphone off if audio is unwanted; this app never requests it.
+4. Use the cyan translation joystick and amber yaw joystick simultaneously. Try a diagonal, release, HOLD, SCAN and DRIVE MODE. Rate selectors change only simulated speed/turn rate. Arrow keys also operate a focused joystick.
+5. LIGHTS changes only the view overlay; BEACON toggles a local indicator. SENSORS explains the synthetic readings; PAYLOAD shows the CAD-based rover; the map expands in a dialog. Settings offers a minimal HUD, decorative motion reduction and Demo Reset. The short initialization banner is skippable and does not block access. The system reduced-motion preference is respected.
+6. Stop the iPad screen recorder. The resulting recording belongs to iPadOS; the app has no recording or upload path.
+
+## Structure and limits
+
+- `src/camera.ts`: video-only acquisition, explicit lifecycle and stale-request cancellation.
+- `src/simulation.ts`: deterministic vectors, persistent virtual navigation, strict crop bounds.
+- `src/Joystick.tsx`: independent pointer ownership/capture, deadzone, saturation and interruption handling.
+- `src/Instruments.tsx`: authored HUD, six-wheel vehicle schematic, contours and elevation.
+- `src/App.tsx`, `src/styles.css`: frozen cockpit composition and local actions. Frame transforms use `requestAnimationFrame`; React telemetry updates are limited to 10 Hz.
+- `docs/design-kit/`: original design references and supplied reference documents. `docs/ASSET_PROVENANCE.md` explains the white/green rover edit.
+
+The named HC-SR04+, DS18B20 and BMP280 sensors provide design context only. Values are not sensor measurements. The UI does not claim GPS, networking, autonomous mapping or physical driving authority. Physical iPad rear-camera behavior and performance require real-device acceptance testing; emulated WebKit is not an iPad.
 
