@@ -25,11 +25,21 @@ npm run preview
 
 The browser suite starts production preview at `http://127.0.0.1:4173/rovergadv/`. Chromium and WebKit are distinct projects. Tests use a labeled canvas MediaStream for camera success, mock errors, and do not need a physical camera. `npm run test:e2e -- --project=chromium` selects one engine. `CHROMIUM_PATH` can select an installed Chromium executable for local QA. CI installs both engines and uploads browser reports, failure traces and screenshots. `docs/QA_REPORT.md` records checks actually performed; local screenshots are in `docs/qa/`.
 
-## GitHub Pages
+## GitHub Pages — gadv.gravitymatter.com/rovergadv/
 
-Target: [GADV D4-S cockpit](https://krishnadhoundiyal.github.io/rovergadv/).
+**Target public URL after configuration:** https://gadv.gravitymatter.com/rovergadv/
 
-Vite base is `/rovergadv/`. After PR review and merge, the Pages workflow builds `main` and deploys `dist`. **Manual repository setting:** Settings → Pages → Build and deployment → Source → **GitHub Actions**. The repository must permit Pages deployments and Actions must have the workflow's `pages: write` and `id-token: write` permissions. This PR does not merge or publish itself. The deployment workflow can also be dispatched manually after it is on `main`.
+This is a project app under the **`/rovergadv/` path**, not at the root. The frozen Vite `base: '/rovergadv/'` and local Playwright preview path are intentionally preserved. The GitHub Actions Pages workflow stages `dist` at `pages-site/rovergadv/` and adds a minimal root redirect to `/rovergadv/` before publishing `pages-site`. Do not revert the build base to `/`.
+
+### Manual account settings required
+
+1. Verify control of `gravitymatter.com` and, if offered, verify the domain in GitHub to reduce takeover risk.
+2. In **repository Settings → Pages** select **Build and deployment source: GitHub Actions**, then set the **Custom domain** to exactly `gadv.gravitymatter.com` (hostname only; *no* `https://` and *no* `/rovergadv/`). Save it.
+3. In the `gravitymatter.com` DNS zone configure **CNAME `gadv` → `krishnadhoundiyal.github.io`**. Remove conflicting records for the same hostname. **Configure the custom hostname in GitHub before adding the DNS record** to avoid subdomain takeover.
+4. Merge the custom-domain staging PR and trigger the **Deploy GitHub Pages** workflow on `main` if it has not started automatically. It must pass both build and deploy jobs.
+5. Wait for DNS resolution and TLS certificate issuance, then turn on **Enforce HTTPS** in Pages settings. On the iPad open **https://gadv.gravitymatter.com/rovergadv/**; camera access requires HTTPS.
+
+With an **Actions-based deployment**, GitHub's Pages custom-domain setting is authoritative: adding a `CNAME` source file does not set the custom domain and is not required. DNS may take time to propagate. Do not claim the public site works until DNS, HTTPS and the deployed `/rovergadv/` assets are verified. The earlier `krishnadhoundiyal.github.io/rovergadv/` address may redirect once the custom domain is active.
 
 ## iPad Pro Safari camera
 
